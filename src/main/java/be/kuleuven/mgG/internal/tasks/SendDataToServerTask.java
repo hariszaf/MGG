@@ -241,10 +241,9 @@ public class SendDataToServerTask extends AbstractTask {
 
         try {
                 String jsonQuery = jsonObject.toJSONString();
-//                String serverURL = "https://msysbio.gbiomed.kuleuven.be/upload-abundance-table-dev";
-                String serverURL = "http://localhost:1337/upload-abundance-table-dev";
-//                String serverURL = "http://localhost:1337/test-cx2";
-//                String serverURL = "http://localhost:1337/toy-cx2";
+                String serverURL = "https://msysbio.gbiomed.kuleuven.be/upload-abundance-table-dev";
+//                String serverURL = "http://localhost:1337/upload-abundance-table-dev";
+
 
                 HttpPost httpPost = new HttpPost(serverURL);
                 httpPost.setConfig(config);
