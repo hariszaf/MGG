@@ -49,15 +49,6 @@ public class SendDataToServerTask extends AbstractTask {
         
  	// @Tunables part -- Parameters/Arguments      
 
-     @Tunable(
-    		 description="microbetag server",
-    		 tooltip="<html>The microbetag server to annotate your data with: our public server (default),<br>"
-    				 + "or your own, e.g. http://localhost:5000</html>",
-    		 groups={"Server"},
-    		 gravity=0.5,
-    		 required=true
-    )
-     public String SERVER_URL = getServer();
     
      @Tunable(
     		 description="Choose input type", 
@@ -187,7 +178,7 @@ public class SendDataToServerTask extends AbstractTask {
     
     }
     
-    /** The microbetag server set last, in this dialog or with Apps > MGG > Set microbetag server. */
+    /** The microbetag server set with Apps > MGG > Set microbetag server; our public server by default. */
     public static String getServer() {
         return PREFS.get(SERVER_PREF, PUBLIC_SERVER);
     }
@@ -288,8 +279,8 @@ public class SendDataToServerTask extends AbstractTask {
 
         try {
                 String jsonQuery = jsonObject.toJSONString();
-                String serverURL = annotateURL(SERVER_URL);
-                setServer(SERVER_URL);
+                // Set with Apps > MGG > Set microbetag server
+                String serverURL = annotateURL(getServer());
                 taskMonitor.setStatusMessage("Sending your data to " + serverURL);
 
                 HttpPost httpPost = new HttpPost(serverURL);
