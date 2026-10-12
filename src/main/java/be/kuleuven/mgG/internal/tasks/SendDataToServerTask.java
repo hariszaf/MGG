@@ -11,6 +11,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.prefs.Preferences;
 import org.cytoscape.work.AbstractTask;
 
 import org.cytoscape.work.TaskMonitor;
@@ -31,6 +32,14 @@ import be.kuleuven.mgG.internal.utils.LogUtils;
 
 
 public class SendDataToServerTask extends AbstractTask {
+
+	// The public microbetag server, and the route that annotates the data sent
+	public static final String PUBLIC_SERVER = "https://msysbio.gbiomed.kuleuven.be";
+	private static final String ANNOTATE_ROUTE = "/upload-abundance-table-dev";
+
+	// The last server used is remembered across Cytoscape sessions
+	private static final Preferences PREFS = Preferences.userNodeForPackage(SendDataToServerTask.class);
+	private static final String SERVER_PREF = "microbetagServer";
  	
 	private  String serverResponse; // Stores the server response
 	private final JSONObject dataObject; // The JSON array to send to the server
@@ -39,6 +48,16 @@ public class SendDataToServerTask extends AbstractTask {
     private final MGGManager mggManager;  // The MGGManager instance for retrieving the JSON array
         
  	// @Tunables part -- Parameters/Arguments      
+
+     @Tunable(
+    		 description="microbetag server",
+    		 tooltip="<html>The microbetag server to annotate your data with: our public server (default),<br>"
+    				 + "or your own, e.g. http://localhost:5000</html>",
+    		 groups={"Server"},
+    		 gravity=0.5,
+    		 required=true
+    )
+     public String SERVER_URL = PREFS.get(SERVER_PREF, PUBLIC_SERVER);
     
      @Tunable(
     		 description="Choose input type", 
@@ -169,6 +188,25 @@ public class SendDataToServerTask extends AbstractTask {
     }
     
     /**
+     * The URL to send the data to: a server's address, e.g. http://localhost:5000, gets the annotation route;
+     * a full URL, with a path, is used as it is.
+     */
+    static String annotateURL(String server) {
+        String url = (server == null || server.trim().isEmpty()) ? PUBLIC_SERVER : server.trim();
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "http://" + url;
+        }
+        while (url.endsWith("/")) {
+            url = url.substring(0, url.length() - 1);
+        }
+        // No path after the host: add the route
+        if (url.indexOf('/', url.indexOf("//") + 2) < 0) {
+            url += ANNOTATE_ROUTE;
+        }
+        return url;
+    }
+
+    /**
      * Runs the task to send data to the server.
      *
      * @param taskMonitor The task monitor to display progress and status messages.
@@ -241,10 +279,9 @@ public class SendDataToServerTask extends AbstractTask {
 
         try {
                 String jsonQuery = jsonObject.toJSONString();
-//                String serverURL = "https://msysbio.gbiomed.kuleuven.be/upload-abundance-table-dev";
-                String serverURL = "http://localhost:1337/upload-abundance-table-dev";
-//                String serverURL = "http://localhost:1337/test-cx2";
-//                String serverURL = "http://localhost:1337/toy-cx2";
+                String serverURL = annotateURL(SERVER_URL);
+                PREFS.put(SERVER_PREF, SERVER_URL.trim());
+                taskMonitor.setStatusMessage("Sending your data to " + serverURL);
 
                 HttpPost httpPost = new HttpPost(serverURL);
                 httpPost.setConfig(config);
