@@ -128,7 +128,7 @@ public class CyActivator extends AbstractCyActivator {
 
         ImportMetadataTaskFactory mggImportMetaDataTaskFactory = new ImportMetadataTaskFactory(MGGManager);
         Properties metadataprops = new Properties();
-        metadataprops.setProperty(TITLE, "Import MetaData");
+        metadataprops.setProperty(TITLE, "Import Metadata");
         metadataprops.setProperty(PREFERRED_MENU, "Apps.MGG.Import Data");
         metadataprops.setProperty(IN_TOOL_BAR, "FALSE");
         metadataprops.setProperty(IN_MENU_BAR, "TRUE");
@@ -170,7 +170,7 @@ public class CyActivator extends AbstractCyActivator {
         
         CheckMetaDataFileTaskFactory mggCheckMetaDataFileTaskFactory = new CheckMetaDataFileTaskFactory(MGGManager);
         Properties checkMetaDataprops = new Properties();
-        checkMetaDataprops.setProperty(TITLE, "Check  MetaData");
+        checkMetaDataprops.setProperty(TITLE, "Check Metadata");
         checkMetaDataprops.setProperty(PREFERRED_MENU, "Apps.MGG.Import Data.Check Data Files");
         checkMetaDataprops.setProperty(IN_TOOL_BAR, "FALSE");
         checkMetaDataprops.setProperty(IN_MENU_BAR, "TRUE");
