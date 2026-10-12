@@ -29,7 +29,7 @@ private final MGGManager mggManager;
 	public boolean isReady() {
 		JSONObject metaDataObject=mggManager.getMetadataJsonObject();
 		
-		 return metaDataObject != null && metaDataObject.containsKey("metadata");
+		 return metaDataObject != null && metaDataObject.containsKey("metadata") && SendDataToServerTask.isPublicServer();
 	}
 
 }

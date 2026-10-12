@@ -50,7 +50,8 @@ public class ImportMetadataTaskFactory implements TaskFactory {
 	    public boolean isReady() {
 	    	
 	    	JSONObject dataJsonObject = mggManager.getJsonObject();
-	        return dataJsonObject != null;
+	        // Metadata are for network inference, which only the public server does
+	        return dataJsonObject != null && SendDataToServerTask.isPublicServer();
 	   
 	    }
 	}

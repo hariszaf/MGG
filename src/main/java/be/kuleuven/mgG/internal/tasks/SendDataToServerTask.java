@@ -168,8 +168,11 @@ public class SendDataToServerTask extends AbstractTask {
     	this.metaDataObject = mggManager.getMetadataJsonObject();
     	this.networkObject  = mggManager.getNetworkObject();
 
-        // Dynamically determine INPUT options based on whether networkObject is empty
-        if (networkObject != null && !networkObject.isEmpty()) {
+        // Dynamically determine INPUT options based on whether networkObject is empty;
+        // a server other than the public one needs a network
+        if (!isPublicServer()) {
+            this.INPUT = new ListSingleSelection<>("network");
+        } else if (networkObject != null && !networkObject.isEmpty()) {
             this.INPUT = new ListSingleSelection<>("abundance table", "network");
         } else {
             this.INPUT = new ListSingleSelection<>("abundance table");
@@ -178,6 +181,14 @@ public class SendDataToServerTask extends AbstractTask {
     
     }
     
+    /**
+     * Whether the public server is set. Another server, e.g. one of your own genomes, does not infer networks:
+     * it needs a network, and does not use metadata.
+     */
+    public static boolean isPublicServer() {
+        return annotateURL(getServer()).equals(annotateURL(PUBLIC_SERVER));
+    }
+
     /** The microbetag server set with Apps > MGG > Set microbetag server; our public server by default. */
     public static String getServer() {
         return PREFS.get(SERVER_PREF, PUBLIC_SERVER);
@@ -227,7 +238,7 @@ public class SendDataToServerTask extends AbstractTask {
         }
 
         // Add the 'metadata' JSONArray from metaDataObject
-        if (metaDataObject != null && metaDataObject.containsKey("metadata")) {
+        if (isPublicServer() && metaDataObject != null && metaDataObject.containsKey("metadata")) {
             JSONArray metaDataJsonArray = (JSONArray) metaDataObject.get("metadata");
             jsonObject.put("metadata", metaDataJsonArray);
         }
