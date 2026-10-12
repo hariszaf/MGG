@@ -57,7 +57,7 @@ public class SendDataToServerTask extends AbstractTask {
     		 gravity=0.5,
     		 required=true
     )
-     public String SERVER_URL = PREFS.get(SERVER_PREF, PUBLIC_SERVER);
+     public String SERVER_URL = getServer();
     
      @Tunable(
     		 description="Choose input type", 
@@ -187,6 +187,15 @@ public class SendDataToServerTask extends AbstractTask {
     
     }
     
+    /** The microbetag server set last, in this dialog or with Apps > MGG > Set microbetag server. */
+    public static String getServer() {
+        return PREFS.get(SERVER_PREF, PUBLIC_SERVER);
+    }
+
+    public static void setServer(String server) {
+        PREFS.put(SERVER_PREF, (server == null || server.trim().isEmpty()) ? PUBLIC_SERVER : server.trim());
+    }
+
     /**
      * The URL to send the data to: a server's address, e.g. http://localhost:5000, gets the annotation route;
      * a full URL, with a path, is used as it is.
@@ -280,7 +289,7 @@ public class SendDataToServerTask extends AbstractTask {
         try {
                 String jsonQuery = jsonObject.toJSONString();
                 String serverURL = annotateURL(SERVER_URL);
-                PREFS.put(SERVER_PREF, SERVER_URL.trim());
+                setServer(SERVER_URL);
                 taskMonitor.setStatusMessage("Sending your data to " + serverURL);
 
                 HttpPost httpPost = new HttpPost(serverURL);
