@@ -183,7 +183,7 @@ public class SendDataToServerTask extends AbstractTask {
     
     /**
      * Whether the public server is set. Another server, e.g. one of your own genomes, does not infer networks:
-     * it needs a network, and does not use metadata.
+     * it needs a network (its metadata mark the network's nodes of metadata variables).
      */
     public static boolean isPublicServer() {
         return annotateURL(getServer()).equals(annotateURL(PUBLIC_SERVER));
@@ -238,7 +238,9 @@ public class SendDataToServerTask extends AbstractTask {
         }
 
         // Add the 'metadata' JSONArray from metaDataObject
-        if (isPublicServer() && metaDataObject != null && metaDataObject.containsKey("metadata")) {
+        // With any server: for network inference (public server), and to mark the nodes of metadata variables
+        // in the network given
+        if (metaDataObject != null && metaDataObject.containsKey("metadata")) {
             JSONArray metaDataJsonArray = (JSONArray) metaDataObject.get("metadata");
             jsonObject.put("metadata", metaDataJsonArray);
         }
