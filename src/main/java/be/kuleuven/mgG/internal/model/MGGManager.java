@@ -212,6 +212,85 @@ public class MGGManager implements SessionAboutToBeSavedListener, SessionLoadedL
     public JSONObject getNetworkObject() {
     	return networkObject;
     }
+
+    // A network whose nodes are not all known yet: kept until the metadata explain them (Import Metadata)
+    private JSONObject pendingNetworkObject;
+
+    public JSONObject getPendingNetworkObject() {
+        return pendingNetworkObject;
+    }
+
+    public void setPendingNetworkObject(JSONObject jsonObject) {
+        this.pendingNetworkObject = jsonObject;
+    }
+
+    /**
+     * The nodes of a network that are neither sequences of the abundance table nor metadata variables.
+     * A node of a metadata variable is named after it (e.g. ENV1, or ENV4_A for a value of a categorical
+     * variable): its name starts with the name of a variable of the imported metadata (the first cell of each
+     * of its rows), as the microbetag server tells them apart.
+     */
+    public java.util.List<String> unknownNetworkNodes(JSONObject networkJsonObject) {
+        java.util.Set<String> nodeNamesInNetwork = new java.util.HashSet<>();
+        org.json.simple.JSONArray networkData = (org.json.simple.JSONArray) networkJsonObject.get("network");
+        for (int i = 1; i < networkData.size(); i++) {
+            org.json.simple.JSONArray edge = (org.json.simple.JSONArray) networkData.get(i);
+            nodeNamesInNetwork.add((String) edge.get(0));
+            nodeNamesInNetwork.add((String) edge.get(1));
+        }
+
+        java.util.Set<String> nodeNamesInData = new java.util.HashSet<>();
+        JSONObject dataJsonObject = getJsonObject();
+        if (dataJsonObject != null && dataJsonObject.containsKey("data")) {
+            org.json.simple.JSONArray data = (org.json.simple.JSONArray) dataJsonObject.get("data");
+            for (int i = 1; i < data.size(); i++) {
+                nodeNamesInData.add((String) ((org.json.simple.JSONArray) data.get(i)).get(0));
+            }
+        }
+
+        java.util.List<String> metavars = new java.util.ArrayList<>();
+        JSONObject metadataJsonObject = getMetadataJsonObject();
+        if (metadataJsonObject != null && metadataJsonObject.containsKey("metadata")) {
+            for (Object row : (org.json.simple.JSONArray) metadataJsonObject.get("metadata")) {
+                org.json.simple.JSONArray cells = (org.json.simple.JSONArray) row;
+                if (!cells.isEmpty() && cells.get(0) != null && !cells.get(0).toString().trim().isEmpty()) {
+                    metavars.add(cells.get(0).toString().trim());
+                }
+            }
+        }
+
+        java.util.List<String> unknown = new java.util.ArrayList<>();
+        for (String node : nodeNamesInNetwork) {
+            if (nodeNamesInData.contains(node)) {
+                continue;
+            }
+            boolean isMetavar = false;
+            for (String metavar : metavars) {
+                if (node.startsWith(metavar)) {
+                    isMetavar = true;
+                    break;
+                }
+            }
+            if (!isMetavar) {
+                unknown.add(node);
+            }
+        }
+        java.util.Collections.sort(unknown);
+        return unknown;
+    }
+
+    /**
+     * Accepts the pending network if its nodes are now all known (e.g. once the metadata are imported).
+     * Returns true if it was accepted.
+     */
+    public boolean acceptPendingNetwork() {
+        if (pendingNetworkObject != null && unknownNetworkNodes(pendingNetworkObject).isEmpty()) {
+            setNetworkObject(pendingNetworkObject);
+            pendingNetworkObject = null;
+            return true;
+        }
+        return false;
+    }
     
     
     /**
