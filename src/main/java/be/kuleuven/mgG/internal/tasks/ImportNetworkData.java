@@ -3,6 +3,8 @@ package be.kuleuven.mgG.internal.tasks;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collections;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -141,9 +143,12 @@ public class ImportNetworkData extends AbstractTask {
     
     	// If not all  are present
 	     mggManager.setNetworkObject(null);
+	      List<String> unknown = unknownNodes(networkJsonObject, datajsonObject);
 	      taskMonitor.showMessage(TaskMonitor.Level.ERROR, 
 	        "Node ids of the network are not present with sequence identifiers of "
-	        + " abudance table -> network data can't be imported");
+	        + " abudance table -> network data can't be imported"
+	        + (unknown.isEmpty() ? "" : "; e.g. " + String.join(", ", unknown.subList(0, Math.min(5, unknown.size()))))
+	        + ". Nodes of metadata variables are accepted once the metadata are imported (Import Metadata).");
 	      
 	     // SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, 
 	          //    "Node ids of the network are not present with sequence identifiers of " +
@@ -158,6 +163,17 @@ public class ImportNetworkData extends AbstractTask {
 	private boolean areNodesInDataJson(JSONObject networkJsonObject, JSONObject dataJsonObject) {
 		// This function checks whether the node names of the loaded network, belong to the abundance table already loaded.
 		// If not, then the network will not be loaded successfully, since microbetag would fail.
+		// Nodes of the metadata variables (FlashWeave with metadata) are not in the abundance table: see unknownNodes.
+		return unknownNodes(networkJsonObject, dataJsonObject).isEmpty();
+	}
+
+	/**
+	 * The nodes of the network that are neither sequences of the abundance table nor metadata variables.
+	 * A node of a metadata variable is named after it (e.g. ENV1, or ENV4_A for a value of a categorical
+	 * variable): its name starts with the name of a variable of the imported metadata, as the microbetag
+	 * server tells them apart.
+	 */
+	private List<String> unknownNodes(JSONObject networkJsonObject, JSONObject dataJsonObject) {
 		
 		 JSONArray networkData = (JSONArray) networkJsonObject.get("network");
 		    Set<String> nodeNamesInNetwork = new HashSet<>();
@@ -179,7 +195,36 @@ public class ImportNetworkData extends AbstractTask {
 		            nodeNamesInData.add(nodeName);
 		        }
 		    }		   
-		    return nodeNamesInData.containsAll(nodeNamesInNetwork);
+		    // The metadata variables: the first cell of each row of the metadata, as the server reads them
+		    List<String> metavars = new ArrayList<>();
+		    JSONObject metadataJsonObject = mggManager.getMetadataJsonObject();
+		    if (metadataJsonObject != null && metadataJsonObject.containsKey("metadata")) {
+		        for (Object row : (JSONArray) metadataJsonObject.get("metadata")) {
+		            JSONArray cells = (JSONArray) row;
+		            if (!cells.isEmpty() && cells.get(0) != null && !cells.get(0).toString().trim().isEmpty()) {
+		                metavars.add(cells.get(0).toString().trim());
+		            }
+		        }
+		    }
+
+		    List<String> unknown = new ArrayList<>();
+		    for (String node : nodeNamesInNetwork) {
+		        if (nodeNamesInData.contains(node)) {
+		            continue;
+		        }
+		        boolean isMetavar = false;
+		        for (String metavar : metavars) {
+		            if (node.startsWith(metavar)) {
+		                isMetavar = true;
+		                break;
+		            }
+		        }
+		        if (!isMetavar) {
+		            unknown.add(node);
+		        }
+		    }
+		    Collections.sort(unknown);
+		    return unknown;
 		}
   
 	}
