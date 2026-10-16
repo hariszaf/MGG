@@ -78,16 +78,7 @@ public class ImportMetadataTask extends AbstractTask{
 	            taskMonitor.setProgress(1.0);
 
 	            // A network imported before, with nodes of metadata variables, is loaded now
-	            String networkNote = "";
-	            if (mggManager.acceptPendingNetwork()) {
-	                networkNote = "\nThe network imported before is now loaded too: its other nodes are metadata variables.";
-	            } else if (mggManager.getPendingNetworkObject() != null) {
-	                java.util.List<String> unknown = mggManager.unknownNetworkNodes(mggManager.getPendingNetworkObject());
-	                networkNote = "\nThe network imported before still has " + unknown.size()
-	                    + " node(s) that are neither sequences nor metadata variables, e.g. "
-	                    + String.join(", ", unknown.subList(0, Math.min(5, unknown.size()))) + ".";
-	            }
-	            final String metadataMessage = "Metadata file loaded correctly" + networkNote;
+	            final String metadataMessage = "Metadata file loaded correctly" + mggManager.pendingNetworkNote();
 	            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null, 
 	    	            metadataMessage, "Information", JOptionPane.INFORMATION_MESSAGE));
 

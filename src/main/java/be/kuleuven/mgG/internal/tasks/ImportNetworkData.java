@@ -145,14 +145,16 @@ public class ImportNetworkData extends AbstractTask {
 
 	    } else {
 
-	        // Nodes that are not sequences of the abundance table: metadata variables, if the metadata are
-	        // imported later on; the network is kept until then (MGGManager.acceptPendingNetwork)
+	        // Nodes without a taxonomy yet: the network is kept until their taxonomies (abundance table or
+	        // taxonomy file) or the metadata (for nodes of metadata variables) are imported
+	        // (MGGManager.acceptPendingNetwork)
 	        mggManager.setNetworkObject(null);
 	        mggManager.setPendingNetworkObject(networkJsonObject);
-	        String message = unknown.size() + " node(s) of the network are not sequences of the abundance table, e.g. "
-	            + String.join(", ", unknown.subList(0, Math.min(5, unknown.size()))) + ".\n"
-	            + "If they are metadata variables, import the metadata (Apps > MGG > Import Data > Import Metadata):\n"
-	            + "the network is then loaded. Otherwise, check the network and the abundance table.";
+	        String message = (mggManager.hasTaxa() || mggManager.getMetadataJsonObject() != null
+	                ? unknown.size() + " node(s) of the network have no taxonomy and are not metadata variables, e.g. "
+	                    + String.join(", ", unknown.subList(0, Math.min(5, unknown.size()))) + ".\n"
+	                : "The network is kept: import the taxonomies of its nodes.\n")
+	            + MGGManager.whatNodesNeed() + "\nThe network is loaded once they are all known.";
 	        taskMonitor.showMessage(TaskMonitor.Level.WARN, message.replace("\n", " "));
 	        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
 	            message, "Network not loaded yet", JOptionPane.WARNING_MESSAGE));

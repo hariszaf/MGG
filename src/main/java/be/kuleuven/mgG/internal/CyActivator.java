@@ -28,6 +28,7 @@ import be.kuleuven.mgG.internal.tasks.CheckNetworkTaskFactory;
 import be.kuleuven.mgG.internal.tasks.CreateMGGVisualStyleTaskFactory;
 import be.kuleuven.mgG.internal.tasks.ImportFileTaskFactory;
 import be.kuleuven.mgG.internal.tasks.ImportMetadataTaskFactory;
+import be.kuleuven.mgG.internal.tasks.ImportTaxonomyTaskFactory;
 import be.kuleuven.mgG.internal.tasks.ImportNetworkDataTaskFactory;
 import be.kuleuven.mgG.internal.tasks.SendDataToServerTaskFactory;
 import be.kuleuven.mgG.internal.tasks.ShowResultsPanelAction;
@@ -125,6 +126,19 @@ public class CyActivator extends AbstractCyActivator {
         props.setProperty(COMMAND, "Load_Abudance");
 
         registerService(bc, mggImportFileTaskFactory, TaskFactory.class, props);
+
+        ImportTaxonomyTaskFactory mggImportTaxonomyTaskFactory = new ImportTaxonomyTaskFactory(MGGManager);
+        Properties taxonomyprops = new Properties();
+        taxonomyprops.setProperty(TITLE, "Import Taxonomy");
+        taxonomyprops.setProperty(PREFERRED_MENU, "Apps.MGG.Import Data");
+        taxonomyprops.setProperty(IN_TOOL_BAR, "FALSE");
+        taxonomyprops.setProperty(IN_MENU_BAR, "TRUE");
+        taxonomyprops.setProperty(MENU_GRAVITY, "2.5");
+        taxonomyprops.setProperty(COMMAND_NAMESPACE, "MGG");
+        taxonomyprops.setProperty(COMMAND_DESCRIPTION, "Load the taxonomies of the nodes of a network (node, taxonomy)");
+        taxonomyprops.setProperty(COMMAND, "Load_Taxonomy");
+
+        registerService(bc, mggImportTaxonomyTaskFactory, TaskFactory.class, taxonomyprops);
 
         ImportMetadataTaskFactory mggImportMetaDataTaskFactory = new ImportMetadataTaskFactory(MGGManager);
         Properties metadataprops = new Properties();

@@ -231,10 +231,12 @@ public class SendDataToServerTask extends AbstractTask {
     	// Create a new JSONObject
         JSONObject jsonObject = new JSONObject();
         
-        // Add the 'data' JSONArray from dataObject
-        if (dataObject != null && dataObject.containsKey("data")) {
-            JSONArray dataJsonArray = (JSONArray) dataObject.get("data");
-            jsonObject.put("abundance_data", dataJsonArray);
+        // The abundance table, or, for a network without one, the taxonomy of its nodes (node names and
+        // taxonomies, without samples)
+        JSONArray abundanceData = mggManager.abundanceOrTaxonomy();
+        boolean taxonomyOnly = !(dataObject != null && dataObject.containsKey("data"));
+        if (abundanceData != null) {
+            jsonObject.put("abundance_data", abundanceData);
         }
 
         // Add the 'metadata' JSONArray from metaDataObject
@@ -255,7 +257,8 @@ public class SendDataToServerTask extends AbstractTask {
 	       JSONArray inputParameters = new JSONArray();
 	        
 	 
-	        inputParameters.add("input_type:" + INPUT.getSelectedValue());
+	        // Without an abundance table, the network is the input: there are no samples to infer one from
+	        inputParameters.add("input_type:" + (taxonomyOnly ? "network" : INPUT.getSelectedValue()));
 	        inputParameters.add("taxonomy:" + TAXONOMY.getSelectedValue());
 	        inputParameters.add("delimiter:" + DELIMITER.getSelectedValue()); 
 	        inputParameters.add("sensitive:" + SENSITIVE);
@@ -329,6 +332,8 @@ public class SendDataToServerTask extends AbstractTask {
 						 mggManager.setJsonObject(null);
 						 mggManager.setMetadataJsonObject(null);
 						 mggManager.setNetworkObject(null);
+						 mggManager.setTaxonomyJsonObject(null);
+						 mggManager.setPendingNetworkObject(null);
                         }                        
                       	  
                    } catch (Exception e) {
@@ -344,6 +349,8 @@ public class SendDataToServerTask extends AbstractTask {
 		                 	 mggManager.setJsonObject(null);
 		                 	 mggManager.setMetadataJsonObject(null);
 		                 	 mggManager.setNetworkObject(null);
+		                 	 mggManager.setTaxonomyJsonObject(null);
+		                 	 mggManager.setPendingNetworkObject(null);
 		                 }
                 	 }
                                                               

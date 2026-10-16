@@ -36,7 +36,10 @@ public class SendDataToServerTaskFactory implements TaskFactory {
     	   // A server other than the public one also needs the network: it does not infer one
     	   boolean networkReady = SendDataToServerTask.isPublicServer()
     	           || (mggManager.getNetworkObject() != null && mggManager.getNetworkObject().containsKey("network"));
-    	   if (networkReady && mggManager.getJsonObject() != null && mggManager.getJsonObject().containsKey("data")) {
+    	   // The taxa: an abundance table, or, with a network, a taxonomy file
+    	   boolean taxaReady = (mggManager.getJsonObject() != null && mggManager.getJsonObject().containsKey("data"))
+    	           || (mggManager.getNetworkObject() != null && mggManager.hasTaxa());
+    	   if (networkReady && taxaReady) {
     	        
     	        //Object data = dataObject.get("data");
     	        //if (data instanceof JSONArray) {
