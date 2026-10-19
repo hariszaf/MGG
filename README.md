@@ -6,7 +6,7 @@
 [Microbetag]:https://github.com/hariszaf/microbetag
 [scnetviz]:https://github.com/RBVI/scNetViz
 [cytoscape App Store]:https://apps.cytoscape.org
-[documentation]:https://hariszaf.github.io/microbetag/docs/cytoApp/
+[documentation]:https://microbetag.readthedocs.io/
 
 MGG
 =======================================
