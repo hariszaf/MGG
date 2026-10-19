@@ -41,6 +41,11 @@ public class JSONDisplayPanel extends JPanel  {
                 JSONArray metadataJsonArray = (JSONArray) jsonObject.get("metadata");
                 createTable(metadataJsonArray, "Metadata Table");
             }
+
+            if (jsonObject.containsKey("taxonomy")) {
+                JSONArray taxonomyJsonArray = (JSONArray) jsonObject.get("taxonomy");
+                createTable(taxonomyJsonArray, "Taxonomy Table");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error processing JSON data: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

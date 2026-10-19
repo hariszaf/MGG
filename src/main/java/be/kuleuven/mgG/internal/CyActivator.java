@@ -25,6 +25,7 @@ import be.kuleuven.mgG.internal.tasks.SetServerTaskFactory;
 import be.kuleuven.mgG.internal.tasks.CheckAbudanceFileTaskFactory;
 import be.kuleuven.mgG.internal.tasks.CheckMetaDataFileTaskFactory;
 import be.kuleuven.mgG.internal.tasks.CheckNetworkTaskFactory;
+import be.kuleuven.mgG.internal.tasks.CheckTaxonomyTaskFactory;
 import be.kuleuven.mgG.internal.tasks.CreateMGGVisualStyleTaskFactory;
 import be.kuleuven.mgG.internal.tasks.ImportFileTaskFactory;
 import be.kuleuven.mgG.internal.tasks.ImportMetadataTaskFactory;
@@ -169,16 +170,29 @@ public class CyActivator extends AbstractCyActivator {
         
         CheckAbudanceFileTaskFactory mggCheckAbudanceFileTaskFactory = new CheckAbudanceFileTaskFactory(MGGManager);
         Properties checkdataprops = new Properties();
-        checkdataprops.setProperty(TITLE, "Check Abudance Data");
+        checkdataprops.setProperty(TITLE, "Check Abundance Data");
         checkdataprops.setProperty(PREFERRED_MENU, "Apps.MGG.Import Data.Check Data Files");
         checkdataprops.setProperty(IN_TOOL_BAR, "FALSE");
         checkdataprops.setProperty(IN_MENU_BAR, "TRUE");
         checkdataprops.setProperty(MENU_GRAVITY, "5");
         checkdataprops.setProperty(COMMAND_NAMESPACE, "MGG");
-        checkdataprops.setProperty(COMMAND_DESCRIPTION, "Check abudance data File");
+        checkdataprops.setProperty(COMMAND_DESCRIPTION, "Check the abundance data file");
         checkdataprops.setProperty(COMMAND, "Check_Abudance_Data");
 
         registerService(bc, mggCheckAbudanceFileTaskFactory, TaskFactory.class, checkdataprops);
+
+        CheckTaxonomyTaskFactory mggCheckTaxonomyTaskFactory = new CheckTaxonomyTaskFactory(MGGManager);
+        Properties checkTaxonomyprops = new Properties();
+        checkTaxonomyprops.setProperty(TITLE, "Check Taxonomy");
+        checkTaxonomyprops.setProperty(PREFERRED_MENU, "Apps.MGG.Import Data.Check Data Files");
+        checkTaxonomyprops.setProperty(IN_TOOL_BAR, "FALSE");
+        checkTaxonomyprops.setProperty(IN_MENU_BAR, "TRUE");
+        checkTaxonomyprops.setProperty(MENU_GRAVITY, "5.5");
+        checkTaxonomyprops.setProperty(COMMAND_NAMESPACE, "MGG");
+        checkTaxonomyprops.setProperty(COMMAND_DESCRIPTION, "Check the taxonomies of the nodes (Import Taxonomy)");
+        checkTaxonomyprops.setProperty(COMMAND, "Check_Taxonomy");
+
+        registerService(bc, mggCheckTaxonomyTaskFactory, TaskFactory.class, checkTaxonomyprops);
         
         
         
@@ -197,7 +211,7 @@ public class CyActivator extends AbstractCyActivator {
         
         CheckNetworkTaskFactory mggCheckNetworkTaskFactory = new CheckNetworkTaskFactory (MGGManager);
         Properties checkNetworkprops = new Properties();
-        checkNetworkprops.setProperty(TITLE, "Check  Network Data");
+        checkNetworkprops.setProperty(TITLE, "Check Network Data");
         checkNetworkprops.setProperty(PREFERRED_MENU, "Apps.MGG.Import Data.Check Data Files");
         checkNetworkprops.setProperty(IN_TOOL_BAR, "FALSE");
         checkNetworkprops.setProperty(IN_MENU_BAR, "TRUE");
